@@ -1,0 +1,29 @@
+name: ingest-videos
+on:
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  ingest:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download episode videos from nights-media releases
+        run: |
+          set -euo pipefail
+          mkdir -p v
+          base="https://github.com/superz1402/nights-media/releases/download"
+          curl -fL --retry 3 -o v/episode-007-churel-hinglish.mp4 "$base/night-007-hinglish-v2/episode-007-churel-hinglish.mp4"
+          curl -fL --retry 3 -o v/episode-008-banshee-hinglish.mp4 "$base/night-008-hinglish-v2/episode-008-banshee-hinglish.mp4"
+          curl -fL --retry 3 -o v/episode-010-mothman-hinglish.mp4 "$base/night-010-hinglish-v2/episode-010-mothman-hinglish.mp4"
+          curl -fL --retry 3 -o v/episode-011-aswang-hinglish.mp4 "$base/night-011-hinglish-v2/episode-011-aswang-hinglish.mp4"
+          curl -fL --retry 3 -o v/episode-012-pontianak-hinglish.mp4 "$base/night-012-hinglish-v2/episode-012-pontianak-hinglish.mp4"
+          curl -fL --retry 3 -o v/episode-013-onryo-hinglish.mp4 "$base/night-013-hinglish-v2/episode-013-onryo-hinglish.mp4"
+          ls -la v
+      - name: Commit and push
+        run: |
+          git config user.name "nights-cdn ingest"
+          git config user.email "actions@github.com"
+          git add v
+          git diff --cached --quiet || git commit -m "Add episode videos (permanent Pages URLs for Buffer)"
+          git push
